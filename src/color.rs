@@ -26,7 +26,7 @@ pub fn populate_hashmap(map: &mut HashMap<usize, usize>, key: usize) {
     }
 }
 
-pub fn get_most_popular_color(map: &HashMap<usize, usize>) -> Option<usize> {
+pub fn get_most_popular_color(map: &HashMap<usize, usize>, pop_val: usize) -> Option<usize> {
     let mut biggest_val: usize = 0;
     let mut biggest_key: Option<usize> = None;
     
@@ -41,7 +41,7 @@ pub fn get_most_popular_color(map: &HashMap<usize, usize>) -> Option<usize> {
         let diff = max_val - min_val;
         
         // make this value argable
-        if diff < 55 {
+        if diff < pop_val as u8 {
             continue;
         }
 
