@@ -1,14 +1,14 @@
 use std::env;
 
 pub struct ProgramOption {
-    pub file_path: String,
+    pub file_path: Vec<String>,
     pub prefer_pop_color: usize,
 }
 
 impl ProgramOption {
     pub fn default_value() -> ProgramOption {
         return ProgramOption{
-            file_path: String::new(),
+            file_path: Vec::new(),
             prefer_pop_color: 55,
         };
     }
@@ -34,7 +34,7 @@ pub fn handle_args() -> Option<ProgramOption> {
                 }
             }
             _ => {
-                prog_option.file_path = args[idx].to_string();
+                prog_option.file_path.push(args[idx].to_string());
             }
         }
         idx += 1;
