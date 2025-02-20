@@ -7,7 +7,7 @@ pub struct ProgramOption {
 
 impl ProgramOption {
     pub fn default_value() -> ProgramOption {
-        return ProgramOption{
+        return ProgramOption {
             file_path: Vec::new(),
             prefer_pop_color: 55,
         };
@@ -20,10 +20,10 @@ pub fn handle_args() -> Option<ProgramOption> {
     let mut idx = 1;
     while idx < args.len() {
         match &args[idx][..] {
-            "-pop-color" | "-pc" => {
-                if idx+1 < args.len() {
+            "--pop-color" | "-pc" => {
+                if idx + 1 < args.len() {
                     let mut def_val = false;
-                    let pop_color = args[idx+1].trim().parse().map_err(|e| {
+                    let pop_color = args[idx + 1].trim().parse().map_err(|e| {
                         eprintln!("ERROR: {}", e);
                         def_val = true;
                     });

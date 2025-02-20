@@ -1,7 +1,7 @@
 use image::Rgb;
 use std::collections::HashMap;
 
-pub fn pixel_to_hex(p:&Rgb<u8>) -> usize {
+pub fn pixel_to_hex(p: &Rgb<u8>) -> usize {
     let mut result: usize = 0;
     result += (p[0] as usize) << 16;
     result += (p[1] as usize) << 8;
@@ -29,18 +29,17 @@ pub fn populate_hashmap(map: &mut HashMap<usize, usize>, key: usize) {
 pub fn get_most_popular_color(map: &HashMap<usize, usize>, pop_val: usize) -> Option<usize> {
     let mut biggest_val: usize = 0;
     let mut biggest_key: Option<usize> = None;
-    
+
     for (key, val) in map.iter() {
         let pixel_val = hex_to_pixel(key);
         let r = pixel_val[0];
         let g = pixel_val[1];
         let b = pixel_val[2];
-        
+
         let max_val = *[r, g, b].iter().max().unwrap();
         let min_val = *[r, g, b].iter().min().unwrap();
         let diff = max_val - min_val;
-        
-        // make this value argable
+
         if diff < pop_val as u8 {
             continue;
         }

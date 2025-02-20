@@ -1,9 +1,9 @@
 mod color;
 mod option;
-use option::*;
 use color::*;
-use std::collections::HashMap;
 use image::{DynamicImage, ImageReader, RgbImage};
+use option::*;
+use std::collections::HashMap;
 
 fn main() {
     let arg = handle_args();
