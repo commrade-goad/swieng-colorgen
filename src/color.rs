@@ -1,4 +1,5 @@
 use image::Rgb;
+use palette::{FromColor, Lch, Srgb};
 use std::collections::HashMap;
 
 pub fn pixel_to_hex(p: &Rgb<u8>) -> usize {
@@ -24,6 +25,29 @@ pub fn populate_hashmap(map: &mut HashMap<usize, usize>, key: usize) {
     } else {
         map.insert(key, 1);
     }
+}
+
+pub fn get_analogus_color(p: &Rgb<u8>) -> Vec<Rgb<u8>> {
+    let mut res: Vec<Rgb<u8>> = Vec::new();
+    let convert: [f32; 3] = [
+        p[0] as f32 / 255.0,
+        p[1] as f32 / 255.0,
+        p[2] as f32 / 255.0,
+    ];
+    let original_color: Srgb = Srgb::new(convert[0], convert[1], convert[2]);
+    let mut lch_color: Lch = Lch::from_color(original_color);
+    for _ in 0..5 {
+        lch_color.hue += 60.0;
+        //lch_color.hue += 30.0;
+        let ret_color = Srgb::from_color(lch_color);
+        res.push(Rgb((
+            (ret_color.red * 255.0) as u8,
+            (ret_color.green * 255.0) as u8,
+            (ret_color.blue * 255.0) as u8,
+        )
+            .into()));
+    }
+    return res;
 }
 
 pub fn get_most_popular_color(map: &HashMap<usize, usize>, pop_val: usize) -> Option<usize> {
