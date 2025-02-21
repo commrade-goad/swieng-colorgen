@@ -1,5 +1,5 @@
 use image::Rgb;
-use palette::{FromColor, Lch, Srgb};
+use palette::{FromColor, Hsl, Lch, Srgb};
 use std::collections::HashMap;
 
 pub fn pixel_to_hex(p: &Rgb<u8>) -> usize {
@@ -27,15 +27,15 @@ pub fn populate_hashmap(map: &mut HashMap<usize, usize>, key: usize) {
     }
 }
 
-pub fn get_analogus_color(p: &Rgb<u8>) -> Vec<Rgb<u8>> {
+pub fn get_closest_color(p: &Rgb<u8>) -> Vec<Rgb<u8>> {
     let mut res: Vec<Rgb<u8>> = Vec::new();
-    let convert: [f32; 3] = [
+    let convert: Srgb = Srgb::new(
         p[0] as f32 / 255.0,
         p[1] as f32 / 255.0,
         p[2] as f32 / 255.0,
-    ];
-    let original_color: Srgb = Srgb::new(convert[0], convert[1], convert[2]);
-    let mut lch_color: Lch = Lch::from_color(original_color);
+    );
+    let mut lch_color: Lch = Lch::from_color(convert);
+    let mut hsl_color: Hsl = Hsl::from_color(lch_color);
     for _ in 0..5 {
         lch_color.hue += 60.0;
         //lch_color.hue += 30.0;
@@ -47,6 +47,24 @@ pub fn get_analogus_color(p: &Rgb<u8>) -> Vec<Rgb<u8>> {
         )
             .into()));
     }
+
+    hsl_color.lightness = 0.1;
+    let black = Srgb::from_color(hsl_color);
+    res.push(Rgb((
+        (black.red * 255.0) as u8,
+        (black.green * 255.0) as u8,
+        (black.blue * 255.0) as u8,
+    )
+        .into()));
+    hsl_color.lightness = 0.9;
+    let white = Srgb::from_color(hsl_color);
+    res.push(Rgb((
+        (white.red * 255.0) as u8,
+        (white.green * 255.0) as u8,
+        (white.blue * 255.0) as u8,
+    )
+        .into()));
+
     return res;
 }
 

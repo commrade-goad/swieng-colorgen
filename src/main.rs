@@ -21,7 +21,7 @@ fn main() {
             let result = get_most_popular_color(&map, prog_option.prefer_pop_color);
             if result.is_some() {
                 println!("{} : {:06x}", current_path, result.unwrap());
-                let res = get_analogus_color(&hex_to_pixel(&result.unwrap()));
+                let res = get_closest_color(&hex_to_pixel(&result.unwrap()));
                 for i in 0..res.len() {
                     println!("{} : {:06x}", current_path,  pixel_to_hex(&res[i]));
                 }
