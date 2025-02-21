@@ -2,25 +2,6 @@ use image::Rgb;
 use palette::{FromColor, Hsl, Lch, Srgb};
 use std::collections::HashMap;
 
-pub enum ColorType {
-    NBLACK(usize),
-    DBLACK(usize),
-    NRED(usize),
-    DRED(usize),
-    NGREEN(usize),
-    DGREEN(usize),
-    NYELLOW(usize),
-    DYELLOW(usize),
-    NBLUE(usize),
-    DBLUE(usize),
-    NMAGENTA(usize),
-    DMAGENTA(usize),
-    NCYAN(usize),
-    DCYAN(usize),
-    NWHITE(usize),
-    DWHITE(usize),
-}
-
 pub fn pixel_to_hex(p: &Rgb<u8>) -> usize {
     let mut result: usize = 0;
     result += (p[0] as usize) << 16;
