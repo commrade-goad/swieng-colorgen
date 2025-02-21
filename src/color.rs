@@ -27,45 +27,70 @@ pub fn populate_hashmap(map: &mut HashMap<usize, usize>, key: usize) {
     }
 }
 
+fn srgb_2_rgb(srgb: &palette::rgb::Rgb) -> Rgb<u8> {
+    return Rgb((
+        (srgb.red * 255.0) as u8,
+        (srgb.green * 255.0) as u8,
+        (srgb.blue * 255.0) as u8,
+    )
+        .into())
+}
+
 pub fn get_closest_color(p: &Rgb<u8>) -> Vec<Rgb<u8>> {
-    let mut res: Vec<Rgb<u8>> = Vec::new();
-    let convert: Srgb = Srgb::new(
+    let mut ret_val: Vec<Rgb<u8>> = Vec::new();
+    let p_as_srgb: Srgb = Srgb::new(
         p[0] as f32 / 255.0,
         p[1] as f32 / 255.0,
         p[2] as f32 / 255.0,
     );
-    let mut lch_color: Lch = Lch::from_color(convert);
-    let mut hsl_color: Hsl = Hsl::from_color(lch_color);
+    let mut accent_lch_color: Lch = Lch::from_color(p_as_srgb);
+    let mut accent_hsl_color: Hsl = Hsl::from_color(accent_lch_color);
+    accent_hsl_color.lightness += 0.2;
+    accent_lch_color = Lch::from_color(accent_hsl_color);
+
+    // for bright and normal color
     for _ in 0..5 {
-        lch_color.hue += 60.0;
-        //lch_color.hue += 30.0;
-        let ret_color = Srgb::from_color(lch_color);
-        res.push(Rgb((
-            (ret_color.red * 255.0) as u8,
-            (ret_color.green * 255.0) as u8,
-            (ret_color.blue * 255.0) as u8,
-        )
-            .into()));
+        accent_lch_color.hue += 60.0;
+        let changed_color = Srgb::from_color(accent_lch_color);
+        ret_val.push(srgb_2_rgb(&changed_color));
     }
 
-    hsl_color.lightness = 0.1;
-    let black = Srgb::from_color(hsl_color);
-    res.push(Rgb((
-        (black.red * 255.0) as u8,
-        (black.green * 255.0) as u8,
-        (black.blue * 255.0) as u8,
-    )
-        .into()));
-    hsl_color.lightness = 0.9;
-    let white = Srgb::from_color(hsl_color);
-    res.push(Rgb((
-        (white.red * 255.0) as u8,
-        (white.green * 255.0) as u8,
-        (white.blue * 255.0) as u8,
-    )
-        .into()));
+    accent_lch_color = Lch::from_color(p_as_srgb);
 
-    return res;
+    // for dim color
+    let mut accent_hsl_color_dim = accent_hsl_color.clone();
+    accent_hsl_color_dim.lightness -= 0.1;
+    let ret_color = Srgb::from_color(accent_hsl_color_dim);
+    ret_val.push(srgb_2_rgb(&ret_color));
+    for _ in 0..5 {
+        accent_lch_color.hue += 60.0;
+        let mut changed_hsl_color: Hsl = Hsl::from_color(accent_lch_color);
+        changed_hsl_color.lightness -= 0.1;
+        let changed_color = Srgb::from_color(changed_hsl_color);
+        ret_val.push(srgb_2_rgb(&changed_color));
+    }
+
+    // for black and white color more higher
+    accent_hsl_color.lightness = 0.1;
+    let black = Srgb::from_color(accent_hsl_color);
+    ret_val.push(srgb_2_rgb(&black));
+    accent_hsl_color.lightness = 0.9;
+    let white = Srgb::from_color(accent_hsl_color);
+    ret_val.push(srgb_2_rgb(&white));
+
+    // for black and white color more lower
+    accent_hsl_color.lightness = 0.25;
+    let black = Srgb::from_color(accent_hsl_color);
+    ret_val.push(srgb_2_rgb(&black));
+    accent_hsl_color.lightness = 0.75;
+    let white = Srgb::from_color(accent_hsl_color);
+    ret_val.push(srgb_2_rgb(&white));
+
+    // for the comment stuff
+    accent_hsl_color.lightness = 0.35;
+    let black = Srgb::from_color(accent_hsl_color);
+    ret_val.push(srgb_2_rgb(&black));
+    return ret_val;
 }
 
 pub fn get_most_popular_color(map: &HashMap<usize, usize>, pop_val: usize) -> Option<usize> {
