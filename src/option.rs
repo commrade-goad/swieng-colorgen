@@ -3,6 +3,7 @@ use std::env;
 pub struct ProgramOption {
     pub file_path: Vec<String>,
     pub prefer_pop_color: usize,
+    pub output_file: String,
 }
 
 impl ProgramOption {
@@ -10,6 +11,7 @@ impl ProgramOption {
         return ProgramOption {
             file_path: Vec::new(),
             prefer_pop_color: 55,
+            output_file: String::new(),
         };
     }
 }
@@ -20,6 +22,11 @@ pub fn handle_args() -> Option<ProgramOption> {
     let mut idx = 1;
     while idx < args.len() {
         match &args[idx][..] {
+            "--output" | "-o" => {
+                if idx + 1 < args.len() {
+                    prog_option.output_file = args[idx+1].clone();
+                }
+            },
             "--pop-color" | "-pc" => {
                 if idx + 1 < args.len() {
                     let mut def_val = false;

@@ -87,7 +87,7 @@ pub fn get_closest_color(p: &Rgb<u8>) -> Vec<Rgb<u8>> {
     ret_val.push(srgb_2_rgb(&white));
 
     // for the comment stuff
-    accent_hsl_color.lightness = 0.35;
+    accent_hsl_color.lightness = 0.4;
     let black = Srgb::from_color(accent_hsl_color);
     ret_val.push(srgb_2_rgb(&black));
     return ret_val;
