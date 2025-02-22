@@ -13,8 +13,3 @@ cargo build --release
 ```sh
 cargo run --release ./img.jpg
 ```
-
-## NOTE
-
-- `.png` is not supported idk why will fix later
-- generate dim and bright color
