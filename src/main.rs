@@ -13,34 +13,26 @@ fn main() {
         for i in 0..prog_option.file_path.len() {
             let current_path: &String = &prog_option.file_path[i];
             let img: DynamicImage = ImageReader::open(current_path).unwrap().decode().unwrap();
-            match img {
-                DynamicImage::ImageRgba8(_) => {
-                    let _ = img.as_rgba8().unwrap();
-                    todo!("PNG NOT SUPPORTED FOR NOW");
+            let imgbuf = img.to_rgb8();
+            for p in imgbuf.pixels() {
+                let convert = pixel_to_hex(p);
+                populate_hashmap(&mut map, convert);
+            }
+            let result = get_most_popular_color(&map, prog_option.prefer_pop_color);
+            if result.is_some() {
+                if !prog_option.output_file.is_empty() {
+                    let ru = result.unwrap();
+                    let mut buffer: String = String::new();
+                    let res: HashMap<String, Rgb<u8>> = get_closest_color_ver2(&hex_to_pixel(&ru));
+                    for (name, color) in res.iter() {
+                        buffer.push_str(&format!("{} = \"{:06x}\"\n", name, pixel_to_hex(color)));
+                    }
+                    let _ = fs::write(prog_option.output_file, buffer.as_bytes());
+                    return;
                 }
-                _ => {
-                    let imgbuf = img.as_rgb8().unwrap();
-                    for p in imgbuf.pixels() {
-                        let convert = pixel_to_hex(p);
-                        populate_hashmap(&mut map, convert);
-                    }
-                    let result = get_most_popular_color(&map, prog_option.prefer_pop_color);
-                    if result.is_some() {
-                        if !prog_option.output_file.is_empty() {
-                            let ru = result.unwrap();
-                            let mut buffer: String = String::new();
-                            let res: HashMap<String, Rgb<u8>> = get_closest_color_ver2(&hex_to_pixel(&ru));
-                            for (name, color) in res.iter() {
-                                buffer.push_str(&format!("{} = \"{:06x}\"\n", name, pixel_to_hex(color)));
-                            }
-                            let _ = fs::write(prog_option.output_file, buffer.as_bytes());
-                            return;
-                        }
-                        let res: HashMap<String, Rgb<u8>> = get_closest_color_ver2(&hex_to_pixel(&result.unwrap()));
-                        for (name, color) in res.iter() {
-                            println!("{} = {:06x}", name, pixel_to_hex(color));
-                        }
-                    }
+                let res: HashMap<String, Rgb<u8>> = get_closest_color_ver2(&hex_to_pixel(&result.unwrap()));
+                for (name, color) in res.iter() {
+                    println!("{} = {:06x}", name, pixel_to_hex(color));
                 }
             }
         }
