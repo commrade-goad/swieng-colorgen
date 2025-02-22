@@ -31,6 +31,8 @@ fn main() {
                             let mut lastnum: usize = 0;
                             let mut buffer: String = String::new();
                             let mut res: Vec<Rgb<u8>> = Vec::new();
+                            get_closest_color_ver2(&hex_to_pixel(&ru));
+                            todo!("GUARDED TESTING STUFF RN");
                             res.push(hex_to_pixel(&ru));
                             res.append(&mut get_closest_color(&hex_to_pixel(&ru)));
                             for i in 0..res.len() {

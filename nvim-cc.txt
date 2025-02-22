@@ -1,0 +1,1 @@
+cargo build --release test/ff2.jpg -o file.out
