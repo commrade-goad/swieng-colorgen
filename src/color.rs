@@ -120,9 +120,6 @@ pub fn get_closest_color_ver2(p: &Rgb<u8>) -> HashMap<String, Rgb<u8>> {
     let saturation_value: f32 = accent_hsl.saturation + 0.1;
     for i in 0..WHEEL.len() {
         let current_color = WHEEL[i];
-        if current_color == accent_color_def {
-            continue;
-        }
 
         // build the name to be color_dark
         let mut color_name: String = current_color.to_string();
@@ -149,7 +146,7 @@ pub fn get_closest_color_ver2(p: &Rgb<u8>) -> HashMap<String, Rgb<u8>> {
         let accent_srgb: Srgb = Srgb::from_color(accent_hsl);
         let name_buffer = format!("black{}", i);
         ret_val.insert(name_buffer, srgb_2_rgb(&accent_srgb));
-        accent_hsl.lightness += 0.1;
+        accent_hsl.lightness += 0.16;
     }
 
     // create the white color
