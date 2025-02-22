@@ -1,5 +1,5 @@
 use image::Rgb;
-use palette::{angle::IntoAngle, FromColor, Hsl, Lch, Srgb};
+use palette::{FromColor, Hsl, Lch, Srgb};
 use std::collections::HashMap;
 
 pub fn pixel_to_hex(p: &Rgb<u8>) -> usize {
@@ -33,7 +33,7 @@ fn srgb_2_rgb(srgb: &palette::rgb::Rgb) -> Rgb<u8> {
         (srgb.green * 255.0) as u8,
         (srgb.blue * 255.0) as u8,
     )
-        .into())
+        .into());
 }
 
 fn default_color_hue_value(color: &str) -> f32 {
@@ -44,7 +44,7 @@ fn default_color_hue_value(color: &str) -> f32 {
         "cyan" => return 180.0,
         "blue" => return 240.0,
         "magenta" => 300.0,
-        _ => return -1.0
+        _ => return -1.0,
     }
 }
 
@@ -85,12 +85,14 @@ pub fn get_closest_color_ver2(p: &Rgb<u8>) -> HashMap<String, Rgb<u8>> {
     // if red then make it the red color, etc
     let accent_color_def: &str = check_color_type(accent_hsl);
     ret_val.insert(accent_color_def.to_string(), srgb_2_rgb(&accent_srgb));
-    
+
     // calculate the diff between the default blue and the current_color
     // accent color clamp it to 7 degree max or min so it didnt impact
     // that much but if want to impact more just delete clamp
     // or increase it.
-    let diff = (accent_hsl.hue.into_inner() - default_color_hue_value(accent_color_def)).clamp(-7.0, 7.0);
+    let max_val: f32 = 6.0;
+    let diff = (accent_hsl.hue.into_inner() - default_color_hue_value(accent_color_def))
+        .clamp(-max_val, max_val);
 
     // if the base color to dark lighten the rest
     let minimal_light: f32 = 0.5;
@@ -102,6 +104,9 @@ pub fn get_closest_color_ver2(p: &Rgb<u8>) -> HashMap<String, Rgb<u8>> {
     const WHEEL: [&str; 6] = ["red", "yellow", "green", "cyan", "blue", "magenta"];
     for i in 0..WHEEL.len() {
         let current_color = WHEEL[i];
+        if current_color == accent_color_def {
+            continue;
+        }
         let default_value = default_color_hue_value(current_color);
         accent_hsl.hue = default_value.into();
         accent_hsl.hue = (default_value - diff).into();
@@ -112,8 +117,12 @@ pub fn get_closest_color_ver2(p: &Rgb<u8>) -> HashMap<String, Rgb<u8>> {
     // for loop to get color not black and white one
     // but darker version
     let lightness_value: f32 = accent_hsl.lightness - 0.1;
+    let saturation_value: f32 = accent_hsl.saturation + 0.1;
     for i in 0..WHEEL.len() {
         let current_color = WHEEL[i];
+        if current_color == accent_color_def {
+            continue;
+        }
 
         // build the name to be color_dark
         let mut color_name: String = current_color.to_string();
@@ -123,71 +132,37 @@ pub fn get_closest_color_ver2(p: &Rgb<u8>) -> HashMap<String, Rgb<u8>> {
         accent_hsl.hue = default_value.into();
         accent_hsl.hue = (default_value - diff).into();
 
-        // use dim lightness value 
+        // use dim lightness value
+        // and the saturation too
         accent_hsl.lightness = lightness_value;
+        accent_hsl.saturation = saturation_value;
 
         let accent_srgb: Srgb = Srgb::from_color(accent_hsl);
         ret_val.insert(color_name, srgb_2_rgb(&accent_srgb));
     }
-
-    println!("{:?}", ret_val);
-    return ret_val;
-}
-
-pub fn get_closest_color(p: &Rgb<u8>) -> Vec<Rgb<u8>> {
-    let mut ret_val: Vec<Rgb<u8>> = Vec::new();
-    let p_as_srgb: Srgb = Srgb::new(
-        p[0] as f32 / 255.0,
-        p[1] as f32 / 255.0,
-        p[2] as f32 / 255.0,
-    );
-    let mut accent_lch_color: Lch = Lch::from_color(p_as_srgb);
-    let mut accent_hsl_color: Hsl = Hsl::from_color(accent_lch_color);
-    accent_hsl_color.lightness += 0.2;
-    accent_lch_color = Lch::from_color(accent_hsl_color);
-
-    // for bright and normal color
-    for _ in 0..5 {
-        accent_lch_color.hue += 60.0;
-        let changed_color = Srgb::from_color(accent_lch_color);
-        ret_val.push(srgb_2_rgb(&changed_color));
+    
+    // create the black color
+    accent_hsl = Hsl::from_color(accent_lch);
+    accent_hsl.lightness = 0.1;
+    accent_hsl.saturation = 0.2;
+    for i in 0..3 {
+        let accent_srgb: Srgb = Srgb::from_color(accent_hsl);
+        let name_buffer = format!("black{}", i);
+        ret_val.insert(name_buffer, srgb_2_rgb(&accent_srgb));
+        accent_hsl.lightness += 0.1;
     }
 
-    accent_lch_color = Lch::from_color(p_as_srgb);
-
-    // for dim color
-    let mut accent_hsl_color_dim = accent_hsl_color.clone();
-    accent_hsl_color_dim.lightness -= 0.1;
-    let ret_color = Srgb::from_color(accent_hsl_color_dim);
-    ret_val.push(srgb_2_rgb(&ret_color));
-    for _ in 0..5 {
-        accent_lch_color.hue += 60.0;
-        let mut changed_hsl_color: Hsl = Hsl::from_color(accent_lch_color);
-        changed_hsl_color.lightness -= 0.1;
-        let changed_color = Srgb::from_color(changed_hsl_color);
-        ret_val.push(srgb_2_rgb(&changed_color));
+    // create the white color
+    accent_hsl = Hsl::from_color(accent_lch);
+    accent_hsl.lightness = 0.9;
+    accent_hsl.saturation = 0.2;
+    for i in 0..3 {
+        let accent_srgb: Srgb = Srgb::from_color(accent_hsl);
+        let name_buffer = format!("white{}", i);
+        ret_val.insert(name_buffer, srgb_2_rgb(&accent_srgb));
+        accent_hsl.lightness -= 0.1;
     }
 
-    // for black and white color more higher
-    accent_hsl_color.lightness = 0.1;
-    let black = Srgb::from_color(accent_hsl_color);
-    ret_val.push(srgb_2_rgb(&black));
-    accent_hsl_color.lightness = 0.9;
-    let white = Srgb::from_color(accent_hsl_color);
-    ret_val.push(srgb_2_rgb(&white));
-
-    // for black and white color more lower
-    accent_hsl_color.lightness = 0.25;
-    let black = Srgb::from_color(accent_hsl_color);
-    ret_val.push(srgb_2_rgb(&black));
-    accent_hsl_color.lightness = 0.75;
-    let white = Srgb::from_color(accent_hsl_color);
-    ret_val.push(srgb_2_rgb(&white));
-
-    // for the comment stuff
-    accent_hsl_color.lightness = 0.4;
-    let black = Srgb::from_color(accent_hsl_color);
-    ret_val.push(srgb_2_rgb(&black));
     return ret_val;
 }
 

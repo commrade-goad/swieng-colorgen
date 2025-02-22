@@ -28,37 +28,17 @@ fn main() {
                     if result.is_some() {
                         if !prog_option.output_file.is_empty() {
                             let ru = result.unwrap();
-                            let mut lastnum: usize = 0;
                             let mut buffer: String = String::new();
-                            let mut res: Vec<Rgb<u8>> = Vec::new();
-                            get_closest_color_ver2(&hex_to_pixel(&ru));
-                            todo!("GUARDED TESTING STUFF RN");
-                            res.push(hex_to_pixel(&ru));
-                            res.append(&mut get_closest_color(&hex_to_pixel(&ru)));
-                            for i in 0..res.len() {
-                                let secbuffer: &str;
-                                match i {
-                                    0..=5 => secbuffer = "bright0",
-                                    6..=11 => secbuffer = "dark0",
-                                    12 | 14 | 16 => secbuffer = "black0",
-                                    _ => secbuffer = "white0"
-                                }
-                                if i == 6 || i == 12 || i == 13 {
-                                    lastnum = 1;
-                                } else if i == 15 {
-                                    lastnum = 2;
-                                } else {
-                                    lastnum += 1;
-                                }
-                                buffer.push_str(&format!("{}{} = \"{:06x}\"\n", secbuffer, lastnum, pixel_to_hex(&res[i])));
+                            let res: HashMap<String, Rgb<u8>> = get_closest_color_ver2(&hex_to_pixel(&ru));
+                            for (name, color) in res.iter() {
+                                buffer.push_str(&format!("{} = \"{:06x}\"\n", name, pixel_to_hex(color)));
                             }
                             let _ = fs::write(prog_option.output_file, buffer.as_bytes());
                             return;
                         }
-                        println!("{} : {:06x}", current_path, result.unwrap());
-                        let res = get_closest_color(&hex_to_pixel(&result.unwrap()));
-                        for i in 0..res.len() {
-                            println!("{} : {:06x}", current_path,  pixel_to_hex(&res[i]));
+                        let res: HashMap<String, Rgb<u8>> = get_closest_color_ver2(&hex_to_pixel(&result.unwrap()));
+                        for (name, color) in res.iter() {
+                            println!("{} = {:06x}", name, pixel_to_hex(color));
                         }
                     }
                 }
