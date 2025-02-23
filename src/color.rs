@@ -98,7 +98,7 @@ pub fn get_closest_color_ver2(p: &Rgb<u8>) -> HashMap<String, Rgb<u8>> {
     // if the base color to dark lighten the rest
     let minimal_light: f32 = 0.4;
     if accent_hsl.lightness < minimal_light {
-        accent_hsl.lightness = minimal_light + 0.2;
+        accent_hsl.lightness = minimal_light + 0.1;
     }
 
     // for loop to get color not black and white one
