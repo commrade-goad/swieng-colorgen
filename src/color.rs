@@ -101,9 +101,9 @@ pub fn get_closest_color_ver2(p: &Rgb<u8>) -> HashMap<String, Rgb<u8>> {
         accent_hsl.lightness = (accent_hsl.lightness + minimal_light) / 4.0;
     }
 
-    // limit the diff to max angle 30 so it wont
+    // limit the diff to max angle so it wont
     // bleed to other color.
-    let max_diff_deg: f32 = 20.0;
+    let max_diff_deg: f32 = 25.0;
     diff = diff.clamp(-max_diff_deg, max_diff_deg);
 
     // for loop to get color not black and white one
