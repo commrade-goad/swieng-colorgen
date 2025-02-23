@@ -93,13 +93,18 @@ pub fn get_closest_color_ver2(p: &Rgb<u8>) -> HashMap<String, Rgb<u8>> {
     // that much but if want to impact more just delete clamp
     // or increase it.
     let hue = (accent_hsl.hue.into_inner() + 360.0) % 360.0;
-    let diff = hue - default_color_hue_value(accent_color_def);
+    let mut diff = hue - default_color_hue_value(accent_color_def);
 
     // if the base color to dark lighten the rest
     let minimal_light: f32 = 0.4;
     if accent_hsl.lightness < minimal_light {
-        accent_hsl.lightness = minimal_light + 0.1;
+        accent_hsl.lightness = (accent_hsl.lightness + minimal_light) / 4.0;
     }
+
+    // limit the diff to max angle 30 so it wont
+    // bleed to other color.
+    let max_diff_deg: f32 = 20.0;
+    diff = diff.clamp(-max_diff_deg, max_diff_deg);
 
     // for loop to get color not black and white one
     const WHEEL: [&str; 6] = ["red", "yellow", "green", "cyan", "blue", "magenta"];
@@ -136,7 +141,7 @@ pub fn get_closest_color_ver2(p: &Rgb<u8>) -> HashMap<String, Rgb<u8>> {
         let accent_srgb: Srgb = Srgb::from_color(accent_hsl);
         ret_val.insert(color_name, srgb_2_rgb(&accent_srgb));
     }
-    
+
     // create the black color
     accent_hsl = Hsl::from_color(accent_lch);
     accent_hsl.lightness = 0.1;
