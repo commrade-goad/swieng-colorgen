@@ -1,5 +1,5 @@
 use image::Rgb;
-use palette::{FromColor, Hsl, Lch, Srgb};
+use palette::{FromColor, Hsl, Lch, SetHue, Srgb};
 use std::collections::HashMap;
 
 pub fn pixel_to_hex(p: &Rgb<u8>) -> usize {
@@ -92,12 +92,11 @@ pub fn get_closest_color_ver2(p: &Rgb<u8>) -> HashMap<String, Rgb<u8>> {
     // accent color clamp it to 7 degree max or min so it didnt impact
     // that much but if want to impact more just delete clamp
     // or increase it.
-    let max_val: f32 = 6.0;
-    let diff = (accent_hsl.hue.into_inner() - default_color_hue_value(accent_color_def))
-        .clamp(-max_val, max_val);
+    let hue = (accent_hsl.hue.into_inner() + 360.0) % 360.0;
+    let diff = hue - default_color_hue_value(accent_color_def);
 
     // if the base color to dark lighten the rest
-    let minimal_light: f32 = 0.5;
+    let minimal_light: f32 = 0.4;
     if accent_hsl.lightness < minimal_light {
         accent_hsl.lightness = minimal_light + 0.2;
     }
@@ -110,8 +109,7 @@ pub fn get_closest_color_ver2(p: &Rgb<u8>) -> HashMap<String, Rgb<u8>> {
             continue;
         }
         let default_value = default_color_hue_value(current_color);
-        accent_hsl.hue = default_value.into();
-        accent_hsl.hue = (default_value - diff).into();
+        accent_hsl.set_hue(default_value + diff);
         let accent_srgb: Srgb = Srgb::from_color(accent_hsl);
         ret_val.insert(current_color.to_string(), srgb_2_rgb(&accent_srgb));
     }
@@ -128,8 +126,7 @@ pub fn get_closest_color_ver2(p: &Rgb<u8>) -> HashMap<String, Rgb<u8>> {
         color_name.push_str("_dark");
 
         let default_value = default_color_hue_value(current_color);
-        accent_hsl.hue = default_value.into();
-        accent_hsl.hue = (default_value - diff).into();
+        accent_hsl.set_hue(default_value + diff);
 
         // use dim lightness value
         // and the saturation too
