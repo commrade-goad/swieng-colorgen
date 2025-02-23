@@ -49,7 +49,9 @@ fn default_color_hue_value(color: &str) -> f32 {
 }
 
 fn check_color_type(color: Hsl) -> &'static str {
-    let hue: f32 = color.hue.into_inner();
+    let mut hue: f32 = color.hue.into_inner();
+    hue = (hue + 360.0) % 360.0;
+
     if (hue >= 0.0 && hue <= 35.0) || (hue > 330.0 && hue <= 360.0) {
         return "red";
     } else if hue > 35.0 && hue <= 75.0 {
