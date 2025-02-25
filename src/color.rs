@@ -1,6 +1,7 @@
 use image::Rgb;
 use palette::{FromColor, Hsl, Lch, SetHue, Srgb};
 use std::collections::HashMap;
+use crate::option::ProgramOption;
 
 pub fn pixel_to_hex(p: &Rgb<u8>) -> usize {
     let mut result: usize = 0;
@@ -68,7 +69,7 @@ fn check_color_type(color: Hsl) -> &'static str {
     return "";
 }
 
-pub fn get_closest_color_ver2(p: &Rgb<u8>) -> HashMap<String, Rgb<u8>> {
+pub fn get_closest_color_ver2(p: &Rgb<u8>, po: &ProgramOption) -> HashMap<String, Rgb<u8>> {
     let mut ret_val: HashMap<String, Rgb<u8>> = HashMap::new();
     let p_as_srgb: Srgb = Srgb::new(
         p[0] as f32 / 255.0,
@@ -96,21 +97,18 @@ pub fn get_closest_color_ver2(p: &Rgb<u8>) -> HashMap<String, Rgb<u8>> {
     let mut diff = hue - default_color_hue_value(accent_color_def);
 
     // if the base color to dark lighten the rest
-    let minimal_light: f32 = 0.5;
-    accent_hsl.lightness = accent_hsl.lightness.clamp(minimal_light + 0.05, 1.0);
-    if accent_hsl.lightness < minimal_light {
-        accent_hsl.lightness = minimal_light;
+    accent_hsl.lightness = accent_hsl.lightness.clamp(po.min_light + 0.05, 1.0);
+    if accent_hsl.lightness < po.min_light {
+        accent_hsl.lightness = po.min_light;
     }
 
     // if the accent color to saturated (popping)
     // decrease it for the other color
-    let max_sat: f32 = 0.45;
-    accent_hsl.saturation = accent_hsl.saturation.clamp(0.1, max_sat - 0.05);
+    accent_hsl.saturation = accent_hsl.saturation.clamp(0.1, po.max_sat - 0.05);
 
     // limit the diff to max angle so it wont
     // bleed to other color.
-    let max_diff_deg: f32 = 30.0;
-    diff = diff.clamp(-max_diff_deg, max_diff_deg);
+    diff = diff.clamp(-po.max_diff, po.max_diff);
 
     // for loop to get color not black and white one
     const WHEEL: [&str; 6] = ["red", "yellow", "green", "cyan", "blue", "magenta"];

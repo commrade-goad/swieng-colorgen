@@ -22,14 +22,14 @@ fn main() {
             if !prog_option.output_file.is_empty() {
                 let ru = result.unwrap();
                 let mut buffer: String = String::new();
-                let res: HashMap<String, Rgb<u8>> = get_closest_color_ver2(&hex_to_pixel(&ru));
+                let res: HashMap<String, Rgb<u8>> = get_closest_color_ver2(&hex_to_pixel(&ru), &prog_option);
                 for (name, color) in res.iter() {
                     buffer.push_str(&format!("{} = \"{:06x}\"\n", name, pixel_to_hex(color)));
                 }
                 let _ = fs::write(prog_option.output_file, buffer.as_bytes());
                 return;
             }
-            let res: HashMap<String, Rgb<u8>> = get_closest_color_ver2(&hex_to_pixel(&result.unwrap()));
+            let res: HashMap<String, Rgb<u8>> = get_closest_color_ver2(&hex_to_pixel(&result.unwrap()), &prog_option);
             for (name, color) in res.iter() {
                 println!("{} = {:06x}", name, pixel_to_hex(color));
             }
