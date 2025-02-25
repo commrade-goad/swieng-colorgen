@@ -96,14 +96,20 @@ pub fn get_closest_color_ver2(p: &Rgb<u8>) -> HashMap<String, Rgb<u8>> {
     let mut diff = hue - default_color_hue_value(accent_color_def);
 
     // if the base color to dark lighten the rest
-    let minimal_light: f32 = 0.4;
+    let minimal_light: f32 = 0.5;
+    accent_hsl.lightness = accent_hsl.lightness.clamp(minimal_light + 0.05, 1.0);
     if accent_hsl.lightness < minimal_light {
-        accent_hsl.lightness = (accent_hsl.lightness + minimal_light) / 4.0;
+        accent_hsl.lightness = minimal_light;
     }
+
+    // if the accent color to saturated (popping)
+    // decrease it for the other color
+    let max_sat: f32 = 0.45;
+    accent_hsl.saturation = accent_hsl.saturation.clamp(0.1, max_sat - 0.05);
 
     // limit the diff to max angle so it wont
     // bleed to other color.
-    let max_diff_deg: f32 = 25.0;
+    let max_diff_deg: f32 = 30.0;
     diff = diff.clamp(-max_diff_deg, max_diff_deg);
 
     // for loop to get color not black and white one
@@ -121,8 +127,8 @@ pub fn get_closest_color_ver2(p: &Rgb<u8>) -> HashMap<String, Rgb<u8>> {
 
     // for loop to get color not black and white one
     // but darker version
-    let lightness_value: f32 = accent_hsl.lightness - 0.1;
-    let saturation_value: f32 = accent_hsl.saturation + 0.1;
+    let lightness_value: f32 = accent_hsl.lightness - 0.12;
+    let saturation_value: f32 = accent_hsl.saturation + 0.06;
     for i in 0..WHEEL.len() {
         let current_color = WHEEL[i];
 
@@ -146,22 +152,22 @@ pub fn get_closest_color_ver2(p: &Rgb<u8>) -> HashMap<String, Rgb<u8>> {
     accent_hsl = Hsl::from_color(accent_lch);
     accent_hsl.lightness = 0.1;
     accent_hsl.saturation = 0.2;
-    for i in 0..3 {
+    for i in 0..4 {
         let accent_srgb: Srgb = Srgb::from_color(accent_hsl);
         let name_buffer = format!("black{}", i);
         ret_val.insert(name_buffer, srgb_2_rgb(&accent_srgb));
-        accent_hsl.lightness += 0.16;
+        accent_hsl.lightness += 0.08;
     }
 
     // create the white color
     accent_hsl = Hsl::from_color(accent_lch);
     accent_hsl.lightness = 0.9;
     accent_hsl.saturation = 0.2;
-    for i in 0..3 {
+    for i in 0..4 {
         let accent_srgb: Srgb = Srgb::from_color(accent_hsl);
         let name_buffer = format!("white{}", i);
         ret_val.insert(name_buffer, srgb_2_rgb(&accent_srgb));
-        accent_hsl.lightness -= 0.1;
+        accent_hsl.lightness -= 0.12;
     }
 
     return ret_val;
