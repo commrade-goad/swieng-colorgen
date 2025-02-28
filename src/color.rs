@@ -53,9 +53,9 @@ fn check_color_type(color: Hsl) -> &'static str {
     let mut hue: f32 = color.hue.into_inner();
     hue = (hue + 360.0) % 360.0;
 
-    if (hue >= 0.0 && hue <= 35.0) || (hue > 330.0 && hue <= 360.0) {
+    if (hue >= 0.0 && hue <= 30.0) || (hue > 330.0 && hue <= 360.0) {
         return "red";
-    } else if hue > 35.0 && hue <= 75.0 {
+    } else if hue > 30.0 && hue <= 75.0 {
         return "yellow";
     } else if hue > 75.0 && hue <= 160.0 {
         return "green";
@@ -97,7 +97,7 @@ pub fn get_closest_color_ver2(p: &Rgb<u8>, po: &ProgramOption) -> HashMap<String
     let mut diff = hue - default_color_hue_value(accent_color_def);
 
     // if the base color to dark lighten the rest
-    accent_hsl.lightness = accent_hsl.lightness.clamp(po.min_light + 0.05, 1.0);
+    accent_hsl.lightness = accent_hsl.lightness.clamp(po.min_light + 0.05, 0.8);
     if accent_hsl.lightness < po.min_light {
         accent_hsl.lightness = po.min_light;
     }
