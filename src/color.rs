@@ -1,7 +1,7 @@
+use crate::option::ProgramOption;
 use image::Rgb;
 use palette::{FromColor, Hsl, Lch, SetHue, Srgb};
 use std::collections::HashMap;
-use crate::option::ProgramOption;
 
 pub fn pixel_to_hex(p: &Rgb<u8>) -> usize {
     let mut result: usize = 0;

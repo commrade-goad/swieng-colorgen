@@ -40,9 +40,10 @@ pub fn handle_args() -> Option<ProgramOption> {
         match &args[idx][..] {
             "--output" | "-o" => {
                 if idx + 1 < args.len() {
-                    prog_option.output_file = args[idx+1].clone();
+                    prog_option.output_file = args[idx + 1].clone();
                 }
-            },
+                idx += 1;
+            }
             "--min-pop-color" | "-mpc" => {
                 if idx + 1 < args.len() {
                     let mut def_val = false;
@@ -68,7 +69,7 @@ pub fn handle_args() -> Option<ProgramOption> {
                     }
                     idx += 1;
                 }
-            },
+            }
             "--max-saturation" | "-maxs" => {
                 if idx + 1 < args.len() {
                     let mut def_val = false;
@@ -81,7 +82,7 @@ pub fn handle_args() -> Option<ProgramOption> {
                     }
                     idx += 1;
                 }
-            },
+            }
             "--max-diff" | "-maxd" => {
                 if idx + 1 < args.len() {
                     let mut def_val = false;
@@ -94,10 +95,10 @@ pub fn handle_args() -> Option<ProgramOption> {
                     }
                     idx += 1;
                 }
-            },
+            }
             "--help" | "-h" => {
                 print_help();
-            },
+            }
             _ => {
                 prog_option.file_path = args[idx].to_string();
             }
