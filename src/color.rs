@@ -172,6 +172,9 @@ pub fn get_closest_color_ver2(p: &Rgb<u8>, po: &ProgramOption) -> HashMap<String
 }
 
 pub fn get_most_popular_color(map: &HashMap<usize, usize>, pop_val: usize) -> Option<usize> {
+    let mut backup_val: usize = 0;
+    let mut backup_key: Option<usize> = None;
+
     let mut biggest_val: usize = 0;
     let mut biggest_key: Option<usize> = None;
 
@@ -180,6 +183,13 @@ pub fn get_most_popular_color(map: &HashMap<usize, usize>, pop_val: usize) -> Op
         let r = pixel_val[0];
         let g = pixel_val[1];
         let b = pixel_val[2];
+
+        // backup if there is no pop color at all use
+        // the most used color forcefully.
+        if backup_val < *val {
+            backup_val = *val;
+            backup_key = Some(*key);
+        }
 
         let max_val = *[r, g, b].iter().max().unwrap();
         let min_val = *[r, g, b].iter().min().unwrap();
@@ -197,5 +207,9 @@ pub fn get_most_popular_color(map: &HashMap<usize, usize>, pop_val: usize) -> Op
             biggest_key = Some(*key);
         }
     }
-    return biggest_key;
+
+    match biggest_key {
+        Some(v) => return Some(v),
+        None => return backup_key
+    }
 }
